@@ -1,104 +1,93 @@
-## Documentação do Ambiente Docker - giropops-senhas
+### Documentação: Aplicativo Flask 'giropops-senhas' com Redis em Docker
 
-Este documento descreve o procedimento para configurar um ambiente de desenvolvimento utilizando Docker para um aplicativo Flask que interage com o Redis.
+#### Introdução
 
-### Componentes
+Este documento descreve como configurar e executar um aplicativo Flask juntamente com um servidor Redis, ambos em contêineres Docker separados. Utilizando Docker, este guia facilita o processo de empacotamento, distribuição e execução da aplicação em qualquer ambiente compatível com contêineres.
 
-O ambiente consiste em dois contêineres Docker:
+#### Pré-requisitos
 
-1. **Contêiner do Aplicativo Flask**:
-    - Baseado na imagem `python:3.13.0a4-alpine3.19`.
-    - Contém o código do aplicativo Flask e suas dependências.
-    - Conecta-se a um serviço Redis para operações de armazenamento de dados.
+- Docker instalado. Para instalação, consulte a [documentação oficial do Docker](https://docs.docker.com/get-docker/).
+- Conhecimento básico sobre Docker, Python, Flask, e Redis.
 
-2. **Contêiner do Serviço Redis**:
-    - Baseado na imagem `redis:7.2.4`.
-    - Serve como um datastore em memória para o aplicativo Flask.
+### Preparação dos Arquivos do Projeto
 
-### Dockerfiles
+Os arquivos necessários para o projeto incluem:
 
-#### Dockerfile do Aplicativo Flask
+- `requirements.txt`: Lista de dependências Python para o aplicativo Flask.
+- `app.py`: Arquivo principal da aplicação Flask.
+- `templates/`: Diretório para os templates HTML do Flask.
+- `static/`: Diretório para arquivos estáticos (CSS, JavaScript).
 
-O arquivo `Dockerfile.app` para construir a imagem do aplicativo Flask é definido como:
+### Dockerfile.app
+
+O `Dockerfile.app` é utilizado para construir a imagem Docker do aplicativo Flask:
 
 ```Dockerfile
 FROM debian:bullseye-slim
-
 WORKDIR /app
-
 COPY requirements.txt .
 COPY app.py .
 COPY templates templates/
 COPY static static/
-
 RUN apt-get update && \
     apt-get install -y python3-pip && \
     python3 -m pip install --no-cache-dir -r requirements.txt && \
     python3 -m pip install --upgrade flask werkzeug
-
 EXPOSE 5000
-
 ENV REDIS_HOST="redis-server"
-
 CMD ["flask", "run", "--host=0.0.0.0"]
 ```
 
-#### Dockerfile do Serviço Redis
+#### Dockerfile.redis
 
-O arquivo `Dockerfile.redis` para construir a imagem do serviço Redis é definido como:
+O `Dockerfile.redis` prepara o contêiner Docker para o servidor Redis. A imagem oficial `redis:7.2.4` pode ser usada diretamente, tornando a criação de um Dockerfile específico opcional. Para documentação:
 
 ```Dockerfile
 FROM redis:7.2.4
-
 EXPOSE 6379
-
-ENTRYPOINT [ "redis-server" ]
+ENTRYPOINT ["redis-server"]
 ```
 
-### Construção das Imagens
+### Construção e Execução dos Contêineres Docker
 
-Para construir as imagens Docker, execute os seguintes comandos no diretório do projeto:
+#### Construindo as Imagens Docker
 
-Construir a imagem do aplicativo Flask:
+- **Aplicativo Flask**:
 
-```sh
-docker build -t dinoaqui/linuxtips-giropops-senhas:1.0 -f ./Dockerfile.app .
-```
+  ```shell
+  docker build -t dinoaqui/linuxtips-giropops-senhas:1.0 -f Dockerfile.app .
+  ```
 
-Construir a imagem do serviço Redis:
+- **Servidor Redis** (Se necessário):
 
-```sh
-docker build -t dinoaqui/redis-server:1.0 -f ./Dockerfile.redis .
-```
+  ```shell
+  docker build -t dinoaqui/redis-server:1.0 -f Dockerfile.redis .
+  ```
 
-### Criação da Rede Docker
+#### Criando a Rede Docker
 
-Crie uma rede no Docker para permitir a comunicação entre os contêineres:
-
-```sh
+```shell
 docker network create vnet-app
 ```
 
-### Execução dos Contêineres
+#### Executando os Contêineres
 
-Iniciar o contêiner Redis:
+- **Servidor Redis**:
 
-```sh
-docker run -d --name redis-server --network vnet-app dinoaqui/redis-server:1.0
-```
+  ```shell
+  docker run -d --name redis-server --network vnet-app dinoaqui/redis-server:1.0
+  ```
 
-Iniciar o contêiner do aplicativo Flask:
+- **Aplicativo Flask**:
 
-```sh
-docker run -it -p 5000:5000 --network vnet-app --name app dinoaqui/linuxtips-giropops-senhas:1.0
-```
+  ```shell
+  docker run -it -p 5000:5000 --network vnet-app --name app dinoaqui/linuxtips-giropops-senhas:1.0
+  ```
 
-Com os dois contêineres em execução, o aplicativo Flask deve ser capaz de se conectar ao serviço Redis utilizando o nome do host `redis-server`, que é definido pela variável de ambiente `REDIS_HOST`.
+#### Acessando a Aplicação
 
-### Acessar o Aplicativo
-
-Após iniciar o contêiner do aplicativo Flask, o aplicativo estará disponível no host local na porta `5000`. Você pode acessar o aplicativo através do navegador no endereço `http://localhost:5000`.
+O aplicativo Flask está disponível em `http://localhost:5000` após os contêineres serem iniciados.
 
 ### Conclusão
 
-Este procedimento configura um ambiente de desenvolvimento Dockerizado composto por um aplicativo Flask e um serviço Redis, permitindo um desenvolvimento e teste isolados e reproduzíveis.
+Este documento forneceu um guia detalhado para configurar e executar um aplicativo Flask com um servidor Redis em contêineres Docker, incluindo a criação dos Dockerfiles. Esta abordagem promove a eficiência no desenvolvimento, testes e implantação, assegurando a consistência entre diferentes ambientes de execução.
