@@ -108,7 +108,3 @@ Após iniciar o contêiner do aplicativo Flask, o aplicativo estará disponível
 ### Conclusão
 
 Este procedimento configura um ambiente de desenvolvimento Dockerizado composto por um aplicativo Flask e um serviço Redis, permitindo um desenvolvimento e teste isolados e reproduzíveis.
-
----
-
-Certifique-se de incluir instruções mais detalhadas sobre como configurar e usar `requirements.txt`, `app.py`, e os diretórios `templates` e `static`, dependendo das necessidades específicas do seu projeto ou equipe.
