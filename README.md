@@ -1,7 +1,3 @@
-Com certeza, aqui está um exemplo de como você pode documentar o processo que você descreveu:
-
----
-
 ## Documentação do Ambiente Docker para Desafio Day 2
 
 Este documento descreve o procedimento para configurar um ambiente de desenvolvimento utilizando Docker para um aplicativo Flask que interage com o Redis.
