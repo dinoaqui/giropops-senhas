@@ -1,4 +1,4 @@
-## Documentação do Ambiente Docker para Desafio Day 2
+## Documentação do Ambiente Docker - giropops-senhas
 
 Este documento descreve o procedimento para configurar um ambiente de desenvolvimento utilizando Docker para um aplicativo Flask que interage com o Redis.
 
