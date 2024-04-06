@@ -82,7 +82,7 @@ docker build -t dinoaqui/redis-server:1.0 -f ./Dockerfile.redis .
 Crie uma rede no Docker para permitir a comunicação entre os contêineres:
 
 ```sh
-docker network create app_network
+docker network create vnet-app
 ```
 
 ### Execução dos Contêineres
@@ -90,13 +90,13 @@ docker network create app_network
 Iniciar o contêiner Redis:
 
 ```sh
-docker run -d --name redis-server --network app_network dinoaqui/redis-server:1.0
+docker run -d --name redis-server --network vnet-app dinoaqui/redis-server:1.0
 ```
 
 Iniciar o contêiner do aplicativo Flask:
 
 ```sh
-docker run -it -p 5000:5000 --network app_network --name app dinoaqui/linuxtips-giropops-senhas:1.0
+docker run -it -p 5000:5000 --network vnet-app --name app dinoaqui/linuxtips-giropops-senhas:1.0
 ```
 
 Com os dois contêineres em execução, o aplicativo Flask deve ser capaz de se conectar ao serviço Redis utilizando o nome do host `redis-server`, que é definido pela variável de ambiente `REDIS_HOST`.
