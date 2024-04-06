@@ -22,27 +22,25 @@ O ambiente consiste em dois contêineres Docker:
 O arquivo `Dockerfile.app` para construir a imagem do aplicativo Flask é definido como:
 
 ```Dockerfile
-FROM python:3.13.0a4-alpine3.19
+FROM debian:bullseye-slim
 
-LABEL description="Desafio Day 2" \
-      stack="Python" \
-      version="3.13.0a4-alpine3.19"
+WORKDIR /app
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-
-COPY requirements.txt /usr/src/app/
-RUN pip install --no-cache-dir -r requirements.txt && pip install werkzeug===2.2.2
-
+COPY requirements.txt .
 COPY app.py .
-COPY templates/ templates/
-COPY static/ static/
+COPY templates templates/
+COPY static static/
+
+RUN apt-get update && \
+    apt-get install -y python3-pip && \
+    python3 -m pip install --no-cache-dir -r requirements.txt && \
+    python3 -m pip install --upgrade flask werkzeug
 
 EXPOSE 5000
 
 ENV REDIS_HOST="redis-server"
 
-ENTRYPOINT ["flask", "run", "--host=0.0.0.0"]
+CMD ["flask", "run", "--host=0.0.0.0"]
 ```
 
 #### Dockerfile do Serviço Redis
@@ -51,10 +49,6 @@ O arquivo `Dockerfile.redis` para construir a imagem do serviço Redis é defini
 
 ```Dockerfile
 FROM redis:7.2.4
-
-LABEL description="Desafio Day 2" \
-      stack="Redis" \
-      version="7.2.4"
 
 EXPOSE 6379
 
